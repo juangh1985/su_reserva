@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+	<meta charset="utf-8">
+
+  <title>Sírvase Usted</title>
+
+  <link href="static/css/bootstrap.css" rel="stylesheet">
+  <link href="static/css/datepicker.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="static/css/jquery-jvectormap-1.2.2.css" type="text/css" media="screen"/>
+  <link href="static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <script src="static/js/jquery-1.10.2.min.js"></script>
+  <script src="static/js/jquery-jvectormap-1.2.2.min.js"></script>
+  <script src="static/js/restaurant.js"></script>
+
+
+
+
+	<style>
+	.container {
+		background: #fff;
+	}
+	#alert {
+		display: none;
+	}
+	</style>
+	<link href="static/css/prettify.css" rel="stylesheet">
+  </head>
+
+  <body>
+
+
+
+<div class="container">
+{% if messages %}
+<ul class="messages">
+	{% for message in messages %}
+		<div class="alert alert-success fade in">
+			<i class="fa fa-exclamation-triangle"></i> {{ message }}
+		</div>
+	{% endfor %}
+</ul>
+{% endif %}
+</div>
+
+
+
+
+
+
+<div class="container">
+<br>
+<div class="col-md-6">
+<div class="panel panel-info">
+  <div class="panel-heading">Mapa Dinámico</div>
+  <div class="panel-body"><div id="world-map" style="width: 100%; height: 480px"></div></div>
+  <div class="panel-footer panel-info">Mapa Dinámico</div>
+</div>
+</div>
+
+<div class="col-md-6">
+
+
+
+<div class="row">
+
+<div class="col-md-6">
+
+<div class="panel panel-info">
+  <div class="panel-heading">Formulario Revisión</div>
+		<div class="panel-body">
+
+
+<form enctype="multipart/form-data" action="/resultados" method="POST"> {% csrf_token %}
+	<div class="form-group">
+		<label>Seleccionar Fecha</label>
+			<input type="text" class="form-control" name="fecha" id="dp1" required>
+
+		<label for="sel1">Seleccione la Hora:</label>
+		<select class="form-control" required name="hora">
+			<option></option>
+			<option value="10:00">10:00</option>
+			<option value="12:00">12:00</option>
+			<option value="14:00">14:00</option>
+			<option value="16:00">16:00</option>
+			<option value="18:00">18:00</option>
+			<option value="20:00">20:00</option>
+			<option value="22:00">22:00</option>
+		</select>
+	</div>
+
+	<button type="submit" class="btn btn-default">Revisar</button>
+</form>
+
+
+
+
+
+
+
+</div>
+  <div class="panel-footer panel-info">Formulario Revisión</div>
+</div>
+	</div>
+
+
+<div class="col-md-6">
+
+<div class="panel panel-danger">
+  <div class="panel-heading">Formulario Reserva</div>
+		<div class="panel-body">
+
+
+
+
+
+<form enctype="multipart/form-data" action="/reservas" method="POST"> {% csrf_token %}
+
+<div class="form-group">
+
+		<label >Mesa:</label>
+		<select class="form-control" required name="mesa">
+			<option></option>
+			{%for m in mesas%}
+			<option value="{{m.id}}">{{m.nombre}} </option>
+			{%endfor%}
+		</select>
+
+
+
+	<label>Seleccionar Fecha</label>
+		<input type="text" class="form-control" name="fecha" id="dp2" required >
+
+	<label for="sel1">Seleccione la Hora:</label>
+	<select class="form-control" required name="hora">
+		<option></option>
+		<option value="10:00">10:00</option>
+		<option value="12:00">12:00</option>
+		<option value="14:00">14:00</option>
+		<option value="16:00">16:00</option>
+		<option value="18:00">18:00</option>
+		<option value="20:00">20:00</option>
+		<option value="22:00">22:00</option>
+	</select>
+
+
+	<label>Contacto</label>
+		<input type="text" class="form-control" required name="contacto">
+
+
+</div>
+
+<button type="submit" class="btn btn-default">Reservar</button>
+</form>
+
+
+
+
+
+
+
+</div>
+  <div class="panel-footer panel-info">Formulario Reserva</div>
+</div>
+	</div>
+
+</div>
+
+
+
+
+
+
+
+
+<div class="row">
+
+<div class="col-md-12">
+
+<div class="panel panel-success">
+  <div class="panel-heading">Tabla de Contenidos: Reservas de la Jornada</div>
+		<div class="panel-body">
+
+
+
+{% if reservas %}
+		<table class="table">
+	<thead>
+		<tr>
+		  <th scope="col">Mesa</th>
+		  <th scope="col">Fecha</th>
+		  <th scope="col">Contacto</th>
+		  <th scope="col">Eliminar</th>
+		</tr>
+	  </thead>
+	  <tbody>
+
+			{%for r in reservas%}
+				<tr>
+				  <td>{{r.mesa}}</td>
+				  <td>{{r.actualizacion|date:"d-m-Y H:i"}}</td>
+				  <td>{{r.contacto}}</td>
+				  <td><button type="button" class="btn btn-danger btn-xs">Eliminar</button></td>
+				</tr>
+			{%endfor%}
+	  </tbody>
+	</table>
+{%else%}
+<h1>No hay registros para mostrar</h1>
+{%endif%}
+
+
+</div>
+  <div class="panel-footer panel-info">Tabla de Contenidos</div>
+</div>
+	</div>
+
+
+
+
+
+</div>
+</div>
+
+
+</div>
+
+
+
+
+
+  <script>
+	$(function(){
+	  $('#world-map').vectorMap({
+		map: 'map',
+		backgroundColor: '#FFFFFF',
+		series: {
+		regions: [{
+		  values: {"c0":"1","c1":"2"},
+		  scale: ['#d9d4ca', '#b3d1ff'],
+		  normalizeFunction: 'polynomial'
+		}]
+	  },
+	regionStyle:{
+		initial:{
+			  fill:"#D9A68B",
+			  stroke:"#000000",
+			  "stroke-width":0.2,
+			  "stroke-opacity":1
+		  },
+		  hover:{
+			  fill:"#FFFFFF",
+			  "fill-opacity":"0.1"
+		  }
+	  },
+
+		series: {
+			regions: [{
+				values: {
+					'path1466-64-3': '#FA3135',
+
+					'path1466-0': '#444A4D',
+
+
+					'path2436': '#3E8C37',
+					'path2430': '#214C1D',
+					'path2436-4': '#3E8C37',
+					'path2430-8': '#214C1D',
+					'path2436-0': '#3E8C37',
+					'path2430-5': '#214C1D',
+					'path2436-05': '#3E8C37',
+					'path2430-1': '#214C1D',
+
+
+					'path1466-64-4': '#FFA500',
+					'path1466-64-7': '#FFA500',
+
+
+					'path1466-93': '#0F7084',
+					'path1466-64': '#0F7084',
+					'path1466-6': '#0F7084',
+					'path1466': '#0F7084',
+
+
+
+
+
+
+
+				},
+				attribute: 'fill'
+			}]
+		}
+
+
+
+	  })
+	});
+	</script>
+
+	<script src="static/js/prettify.js"></script>
+	<script src="static/js/bootstrap-datepicker.js"></script>
+	<script>
+	if (top.location != location) {
+	top.location.href = document.location.href ;
+  }
+		$(function(){
+			window.prettyPrint && prettyPrint();
+			$('#dp1').datepicker({
+				format: 'yyyy-mm-dd'
+			});
+			$('#dp2').datepicker({
+				format: 'yyyy-mm-dd'
+			});
+
+		});
+	</script>
+
+
+  </body>
+ </html>
